@@ -18,15 +18,16 @@ const worker = new Worker('crawl-queue', async job => {
   const { url, websiteId } = job.data;
   console.log(`Starting crawl for ${url}`);
 
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
+  let browser;
   try {
     await prisma.website.update({
       where: { id: websiteId },
       data: { status: 'CRAWLING' }
     });
+
+    browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    const page = await context.newPage();
 
     const response = await page.goto(url, { waitUntil: 'domcontentloaded' });
     const statusCode = response?.status() || 200;
@@ -129,7 +130,9 @@ const worker = new Worker('crawl-queue', async job => {
       data: { status: 'FAILED' }
     });
   } finally {
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 }, { connection });
 
