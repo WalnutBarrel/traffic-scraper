@@ -16,8 +16,10 @@ export default function Dashboard() {
     setStatus("PENDING");
     setData(null);
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
     try {
-      const res = await fetch("http://localhost:3001/api/crawl", {
+      const res = await fetch(`${apiUrl}/api/crawl`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
@@ -38,10 +40,12 @@ export default function Dashboard() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
     if (status === "CRAWLING" && websiteId) {
       interval = setInterval(async () => {
         try {
-          const res = await fetch(`http://localhost:3001/api/crawl/${websiteId}`);
+          const res = await fetch(`${apiUrl}/api/crawl/${websiteId}`);
           const result = await res.json();
 
           if (result.success) {
