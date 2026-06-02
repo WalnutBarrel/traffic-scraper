@@ -7,6 +7,9 @@
     "packages/*"
   ],
   "scripts": {
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "dev:backend": "npm run dev --workspace=apps/backend",
+    "dev:worker": "npm run worker --workspace=apps/backend",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

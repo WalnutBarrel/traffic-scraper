@@ -1,8 +1,15 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
 import { PrismaClient } from '@prisma/client';
 import { addCrawlJob } from './queue/crawlQueue';
 
 const fastify = Fastify({ logger: true });
+
+// Register CORS
+fastify.register(cors, {
+  origin: true // allow all origins for local dev
+});
+
 const prisma = new PrismaClient();
 
 fastify.post('/api/crawl', async (request, reply) => {
@@ -42,7 +49,13 @@ fastify.get('/api/crawl/:websiteId', async (request, reply) => {
   try {
     const website = await prisma.website.findUnique({
       where: { id: websiteId },
-      include: { pages: true }
+      include: { 
+        pages: {
+          include: {
+            keywords: true
+          }
+        } 
+      }
     });
     
     if (!website) {

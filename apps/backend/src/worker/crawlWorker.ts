@@ -86,6 +86,27 @@ const worker = new Worker('crawl-queue', async job => {
       });
     }
 
+    // Extract Keywords using Compromise
+    // Require here since compromise doesn't have built-in types for all submodules by default
+    const nlp = require('compromise');
+    const doc = nlp(bodyText);
+    
+    // Get top nouns/topics by frequency
+    const terms = doc.nouns().out('frequency');
+    // terms is an array: [{ normal: 'keyword', count: 5 }, ...]
+    const topTerms = terms.slice(0, 15);
+
+    if (topTerms.length > 0) {
+      await prisma.keyword.createMany({
+        data: topTerms.map((t: any) => ({
+          pageId: pageRecord.id,
+          term: t.normal,
+          score: t.count,
+          type: 'primary'
+        }))
+      });
+    }
+
     // Update website status
     await prisma.website.update({
       where: { id: websiteId },

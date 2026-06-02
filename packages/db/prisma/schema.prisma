@@ -29,8 +29,21 @@ model Page {
   headings    Heading[]
   links       Link[]
   metaTags    MetaTag[]
+  keywords    Keyword[]
 
   @@map("pages")
+}
+
+model Keyword {
+  id      String @id @default(cuid())
+  pageId  String @map("page_id")
+  term    String
+  score   Float?
+  type    String @default("primary")
+
+  page    Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@map("keywords")
 }
 
 model Heading {
