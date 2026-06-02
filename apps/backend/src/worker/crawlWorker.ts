@@ -3,10 +3,14 @@ import { chromium } from 'playwright';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL
-});
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 const worker = new Worker('crawl-queue', async job => {
   const { url, websiteId } = job.data;

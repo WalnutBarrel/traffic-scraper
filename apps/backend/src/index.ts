@@ -11,9 +11,12 @@ fastify.register(cors, {
   origin: true // allow all origins for local dev
 });
 
-const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL
-});
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 fastify.post('/api/crawl', async (request, reply) => {
   const { url } = request.body as { url: string };
