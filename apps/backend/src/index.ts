@@ -11,7 +11,9 @@ fastify.register(cors, {
   origin: true // allow all origins for local dev
 });
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL
+});
 
 fastify.post('/api/crawl', async (request, reply) => {
   const { url } = request.body as { url: string };

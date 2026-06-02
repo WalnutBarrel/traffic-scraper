@@ -4,7 +4,9 @@ import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 
 const connection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL
+});
 
 const worker = new Worker('crawl-queue', async job => {
   const { url, websiteId } = job.data;
