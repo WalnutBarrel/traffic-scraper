@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Website {
+  id         String   @id @default(cuid())
+  domain     String   @unique
+  status     String
+  createdAt  DateTime @default(now()) @map("created_at")
+  pages      Page[]
+
+  @@map("websites")
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  websiteId   String   @map("website_id")
+  url         String
+  title       String?
+  description String?
+  wordCount   Int      @default(0) @map("word_count")
+  statusCode  Int?     @map("status_code")
+  
+  website     Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  headings    Heading[]
+  links       Link[]
+  metaTags    MetaTag[]
+
+  @@map("pages")
+}
+
+model Heading {
+  id      String @id @default(cuid())
+  pageId  String @map("page_id")
+  type    String // H1, H2, H3
+  text    String
+
+  page    Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@map("headings")
+}
+
+model Link {
+  id           String  @id @default(cuid())
+  sourcePageId String  @map("source_page_id")
+  targetUrl    String  @map("target_url")
+  anchorText   String? @map("anchor_text")
+
+  sourcePage   Page    @relation(fields: [sourcePageId], references: [id], onDelete: Cascade)
+
+  @@map("links")
+}
+
+model MetaTag {
+  id      String @id @default(cuid())
+  pageId  String @map("page_id")
+  name    String
+  content String
+
+  page    Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@map("meta_tags")
+}
