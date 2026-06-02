@@ -72,8 +72,9 @@ fastify.get('/api/crawl/:websiteId', async (request, reply) => {
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3001, host: '0.0.0.0' });
-    console.log('Server running on http://localhost:3001');
+    const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+    await fastify.listen({ port, host: '0.0.0.0' });
+    console.log(`Server running on port ${port}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
