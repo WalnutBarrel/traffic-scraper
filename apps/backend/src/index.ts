@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { PrismaClient } from '@prisma/client';
 import { addCrawlJob } from './queue/crawlQueue';
+import './worker/crawlWorker'; // Run worker in the same process
 
 const fastify = Fastify({ logger: true });
 
